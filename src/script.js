@@ -199,6 +199,7 @@ const renderer = new THREE.WebGLRenderer({
 }) // rendu de la scène en WebGL
 renderer.setSize(sizes.width, sizes.height) // taille du rendu de la scène en fonction de la largeur et de la hauteur de la fenêtre du navigateur
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // résolution du rendu de la scène en fonction de la résolution de l'écran (pour éviter les pixels flous)
+renderer.setClearColor('#262837')
 
 /**
  * Animate
