@@ -20,7 +20,18 @@ const scene = new THREE.Scene();
 /**
  * Textures
  */
- const textureLoader = new THREE.TextureLoader(); // permet de charger des textures
+const textureLoader = new THREE.TextureLoader(); // permet de charger des textures
+const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
+const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
+const doorAmbientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
+const doorHeightTexture = textureLoader.load('/textures/door/height.jpg')
+const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg')
+const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
+const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
+const bricksColorTexture = textureLoader.load('/textures/bricks/color.jpg')
+const bricksAmbientOcclusionTexture = textureLoader.load('/textures/bricks/ambientOcclusion.jpg')
+const bricksNormalTexture = textureLoader.load('/textures/bricks/normal.jpg')
+const bricksRoughnessTexture = textureLoader.load('/textures/bricks/roughness.jpg')
 
 /**
  * House
@@ -32,8 +43,14 @@ scene.add(house)
 
 const walls = new THREE.Mesh(
   new THREE.BoxGeometry(4, 2.5, 4),
-  new THREE.MeshStandardMaterial({ color: '#ac8e82' })
+  new THREE.MeshStandardMaterial({
+    map: bricksColorTexture,
+    aoMap: bricksAmbientOcclusionTexture,
+    normalMap: bricksNormalTexture,
+    roughnessMap: bricksRoughnessTexture
+  })
 )
+walls.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2))
 walls.position.y = 1.25
 scene.add(walls)
 
@@ -57,9 +74,22 @@ scene.add(floor)
 
 // Door
 const door = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 2),
-  new THREE.MeshStandardMaterial({ color: '#aa7b7b' })
+  new THREE.PlaneGeometry(2.2, 2.2, 100, 100),
+  new THREE.MeshStandardMaterial({
+    map: doorColorTexture,
+    transparent: true,
+    alphaMap: doorAlphaTexture,
+    aoMap: doorAmbientOcclusionTexture,
+    displacementMap: doorHeightTexture,
+    displacementScale: 0.1,
+    normalMap: doorNormalTexture,
+    metalnessMap: doorMetalnessTexture,
+    roughnessMap: doorRoughnessTexture
+  })
 )
+
+door.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(door.geometry.attributes.uv.array, 2))
+
 door.position.y = 1
 door.position.z = 2 + 0.01
 house.add(door)
@@ -123,8 +153,10 @@ for(let i = 0; i < 50; i++)
 // Ambient light
 
 const ambientLight = new THREE.AmbientLight('#b9d5ff', 0.12)
+scene.add(ambientLight)
 
 const moonLight = new THREE.DirectionalLight('#b9d5ff', 0.12)
+scene.add(moonLight)
 
 // Door light
 const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
@@ -136,6 +168,7 @@ house.add(doorLight)
  */
  const fog = new THREE.Fog('#262837', 1, 15)
  scene.fog = fog
+
 
 // // Ambient light
 // const ambientLight = new THREE.AmbientLight('#ffffff', 0.5) // lumière ambiante, avec une couleur blanche et une intensité de 0.5
@@ -200,6 +233,7 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height) // taille du rendu de la scène en fonction de la largeur et de la hauteur de la fenêtre du navigateur
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // résolution du rendu de la scène en fonction de la résolution de l'écran (pour éviter les pixels flous)
 renderer.setClearColor('#262837')
+
 
 /**
  * Animate
