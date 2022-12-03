@@ -194,12 +194,20 @@ moonLight.shadow.camera.far = 15
 scene.add(moonLight)
 
 // Door light
-const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
-doorLight.position.set(0, 2.2, 2.7)
-doorLight.shadow.mapSize.width = 256
-doorLight.shadow.mapSize.height = 256
-doorLight.shadow.camera.far = 7
+const doorLight = new THREE.PointLight('#ff7d46', 1, 7) // Couleur, intensité, distance
+doorLight.position.set(0, 2.2, 2.7) // Position
+doorLight.shadow.mapSize.width = 256  // Shadow map width
+doorLight.shadow.mapSize.height = 256 // Shadow map height
+doorLight.shadow.camera.far = 7     // Shadow camera far
 house.add(doorLight)
+
+// Back light
+const backWallLight = new THREE.PointLight('#ff7d46', 1, 7) // Couleur, intensité, distance
+backWallLight.position.set(0, 2.2, -2.7) // Position
+backWallLight.shadow.mapSize.width = 256  // Shadow map width
+backWallLight.shadow.mapSize.height = 256 // Shadow map height
+backWallLight.shadow.camera.far = 7     // Shadow camera far
+house.add(backWallLight)
 
 /**
  * Fog
