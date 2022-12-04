@@ -44,26 +44,26 @@ const grassRoughnessTexture = textureLoader.load('/textures/grass/roughness.jpg'
  */
 
 // House container
-const house = new THREE.Group()
+const house = new THREE.Group() // permet de regrouper des objets
 scene.add(house)
 
 const walls = new THREE.Mesh(
-  new THREE.BoxGeometry(4, 2.5, 4),
-  new THREE.MeshStandardMaterial({
-    map: bricksColorTexture,
-    aoMap: bricksAmbientOcclusionTexture,
-    normalMap: bricksNormalTexture,
-    roughnessMap: bricksRoughnessTexture
+  new THREE.BoxGeometry(4, 2.5, 4), // géométrie de la maison
+  new THREE.MeshStandardMaterial({ // matériau de la maison
+    map: bricksColorTexture, // texture de la maison
+    aoMap: bricksAmbientOcclusionTexture, // texture de l'occlusion ambiante
+    normalMap: bricksNormalTexture, // texture de la normale
+    roughnessMap: bricksRoughnessTexture // texture de la rugosité
   })
 )
-walls.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2))
+walls.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2)) // permet de dupliquer les coordonnées de texture pour les utiliser dans le shader
 walls.position.y = 1.25
 scene.add(walls)
 
 // Roof
 const roof = new THREE.Mesh(
-  new THREE.ConeGeometry(3.5, 1, 4),
-  new THREE.MeshStandardMaterial({ color: '#b35f45' })
+  new THREE.ConeGeometry(3.5, 1, 4), // géométrie du toit
+  new THREE.MeshStandardMaterial({ color: '#b35f45' }) // matériau du toit
 )
 roof.rotation.y = Math.PI * 0.25
 roof.position.y = 2.5 + 0.5
@@ -81,17 +81,17 @@ const floor = new THREE.Mesh(
 )
 floor.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(floor.geometry.attributes.uv.array, 2))
 
-grassColorTexture.repeat.set(8, 8)
+grassColorTexture.repeat.set(8, 8) // permet de répéter la texture 8 fois sur l'axe x et 8 fois sur l'axe y
 grassAmbientOcclusionTexture.repeat.set(8, 8)
 grassNormalTexture.repeat.set(8, 8)
 grassRoughnessTexture.repeat.set(8, 8)
 
-grassColorTexture.wrapS = THREE.RepeatWrapping
+grassColorTexture.wrapS = THREE.RepeatWrapping // permet de répéter la texture sur l'axe x
 grassAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping
 grassNormalTexture.wrapS = THREE.RepeatWrapping
 grassRoughnessTexture.wrapS = THREE.RepeatWrapping
 
-grassColorTexture.wrapT = THREE.RepeatWrapping
+grassColorTexture.wrapT = THREE.RepeatWrapping // permet de répéter la texture sur l'axe y
 grassAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping
 grassNormalTexture.wrapT = THREE.RepeatWrapping
 grassRoughnessTexture.wrapT = THREE.RepeatWrapping
@@ -102,7 +102,7 @@ scene.add(floor)
 
 // Door
 const door = new THREE.Mesh(
-  new THREE.PlaneGeometry(2.2, 2.2, 100, 100),
+  new THREE.PlaneGeometry(2.2, 2.2, 100, 100), // géométrie de la porte (100x100 pour avoir une meilleure qualité)
   new THREE.MeshStandardMaterial({
     map: doorColorTexture,
     transparent: true,
@@ -212,7 +212,7 @@ house.add(backWallLight)
 /**
  * Fog
  */
- const fog = new THREE.Fog('#262837', 1, 15)
+ const fog = new THREE.Fog('#262837', 1, 15) // Couleur, distance minimale, distance maximale
  scene.fog = fog
 
  /**
