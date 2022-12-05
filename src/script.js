@@ -21,6 +21,7 @@ const scene = new THREE.Scene();
  * Textures
  */
 const textureLoader = new THREE.TextureLoader(); // permet de charger des textures
+
 const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
 const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
 const doorAmbientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg')
@@ -38,6 +39,12 @@ const grassColorTexture = textureLoader.load('/textures/grass/color.jpg')
 const grassAmbientOcclusionTexture = textureLoader.load('/textures/grass/ambientOcclusion.jpg')
 const grassNormalTexture = textureLoader.load('/textures/grass/normal.jpg')
 const grassRoughnessTexture = textureLoader.load('/textures/grass/roughness.jpg')
+
+const roofColorTexture = textureLoader.load('/textures/roof/color.jpg')
+const roofAmbientOcclusionTexture = textureLoader.load('/textures/roof/ambientOcclusion.jpg')
+const roofNormalTexture = textureLoader.load('/textures/roof/normal.jpg')
+const roofRoughnessTexture = textureLoader.load('/textures/roof/roughness.jpg')
+const roofMetallicTexture = textureLoader.load('/textures/roof/metallic.jpg')
 
 /**
  * House
@@ -63,7 +70,13 @@ scene.add(walls)
 // Roof
 const roof = new THREE.Mesh(
   new THREE.ConeGeometry(3.5, 1, 4), // géométrie du toit
-  new THREE.MeshStandardMaterial({ color: '#b35f45' }) // matériau du toit
+  new THREE.MeshStandardMaterial({
+    map: roofColorTexture, // texture du toit
+    aoMap: roofAmbientOcclusionTexture, // texture de l'occlusion ambiante
+    normalMap: roofNormalTexture, // texture de la normale
+    roughnessMap: roofRoughnessTexture, // texture de la rugosité
+    metalnessMap: roofMetallicTexture // texture de la métalité
+  }) // matériau du toit
 )
 roof.rotation.y = Math.PI * 0.25
 roof.position.y = 2.5 + 0.5
