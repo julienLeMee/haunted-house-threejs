@@ -3,19 +3,24 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'lil-gui'; // Debug
 import { Group, MeshStandardMaterial } from 'three';
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
 /**
  * Base
  */
 
 // Debug
-const gui = new dat.GUI(); // sert à créer une interface graphique pour modifier les paramètres de la scène (debug)
+// const gui = new dat.GUI(); // sert à créer une interface graphique pour modifier les paramètres de la scène (debug)
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl');
 
 // Scene
 const scene = new THREE.Scene();
+
+// Fonts
+const fontLoader = new FontLoader()
 
 /**
  * Textures
@@ -78,6 +83,23 @@ const roof = new THREE.Mesh(
     metalnessMap: roofMetallicTexture // texture de la métalité
   }) // matériau du toit
 )
+roof.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(roof.geometry.attributes.uv.array, 2)) // permet de dupliquer les coordonnées de texture pour les utiliser dans le shader
+
+roofColorTexture.repeat.set(8, 8) // permet de répéter la texture 8 fois sur l'axe x et 8 fois sur l'axe y
+roofAmbientOcclusionTexture.repeat.set(8, 8)
+roofNormalTexture.repeat.set(8, 8)
+roofRoughnessTexture.repeat.set(8, 8)
+
+roofColorTexture.wrapS = THREE.RepeatWrapping // permet de répéter la texture sur l'axe x
+roofAmbientOcclusionTexture.wrapS = THREE.RepeatWrapping
+roofNormalTexture.wrapS = THREE.RepeatWrapping
+roofRoughnessTexture.wrapS = THREE.RepeatWrapping
+
+roofColorTexture.wrapT = THREE.RepeatWrapping // permet de répéter la texture sur l'axe y
+roofAmbientOcclusionTexture.wrapT = THREE.RepeatWrapping
+roofNormalTexture.wrapT = THREE.RepeatWrapping
+roofRoughnessTexture.wrapT = THREE.RepeatWrapping
+
 roof.rotation.y = Math.PI * 0.25
 roof.position.y = 2.5 + 0.5
 house.add(roof)
@@ -181,14 +203,37 @@ for(let i = 0; i < 50; i++)
     grave.rotation.z = (Math.random() - 0.5) * 0.4
     grave.rotation.y = (Math.random() - 0.5) * 0.4
 
-    grave.castShadow = true
+    // ecrire le nom du mort
+fontLoader.load(
+    'fonts/helvetiker_regular.typeface.json',
+    (font) =>
+    {
+        const textGeometry = new TextGeometry(
+            'R.I.P',
+            {
+                font: font,
+                size: 0.15,
+                height: 0.05,
+                curveSegments: 12,
+                bevelEnabled: true,
+                bevelThickness: 0.02,
+                bevelSize: 0.01,
+                bevelOffset: 0,
+                bevelSegments: 5
+            }
+        )
+        textGeometry.center()
 
-    // Add to the graves container
+        const textMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff' })
+        const text = new THREE.Mesh(textGeometry, textMaterial)
+        text.position.z = 0.1
+        grave.add(text)
+    }
+)
+
     graves.add(grave)
+
 }
-
-floor.receiveShadow = true
-
 
 /**
  * Lights
@@ -201,25 +246,16 @@ const ambientLight = new THREE.AmbientLight('#b9d5ff', 0.12)
 scene.add(ambientLight)
 
 const moonLight = new THREE.DirectionalLight('#b9d5ff', 0.12)
-moonLight.shadow.mapSize.width = 256
-moonLight.shadow.mapSize.height = 256
-moonLight.shadow.camera.far = 15
 scene.add(moonLight)
 
 // Door light
 const doorLight = new THREE.PointLight('#ff7d46', 1, 7) // Couleur, intensité, distance
 doorLight.position.set(0, 2.2, 2.7) // Position
-doorLight.shadow.mapSize.width = 256  // Shadow map width
-doorLight.shadow.mapSize.height = 256 // Shadow map height
-doorLight.shadow.camera.far = 7     // Shadow camera far
 house.add(doorLight)
 
 // Back light
 const backWallLight = new THREE.PointLight('#ff7d46', 1, 7) // Couleur, intensité, distance
 backWallLight.position.set(0, 2.2, -2.7) // Position
-backWallLight.shadow.mapSize.width = 256  // Shadow map width
-backWallLight.shadow.mapSize.height = 256 // Shadow map height
-backWallLight.shadow.camera.far = 7     // Shadow camera far
 house.add(backWallLight)
 
 /**
@@ -232,37 +268,13 @@ house.add(backWallLight)
  * Ghosts
  */
 const ghost1 = new THREE.PointLight('#ff00ff', 2, 3)
-ghost1.shadow.mapSize.width = 256
-ghost1.shadow.mapSize.height = 256
-ghost1.shadow.camera.far = 7
 scene.add(ghost1)
 
 const ghost2 = new THREE.PointLight('#00ffff', 2, 3)
-ghost2.shadow.mapSize.width = 256
-ghost2.shadow.mapSize.height = 256
-ghost2.shadow.camera.far = 7
 scene.add(ghost2)
 
 const ghost3 = new THREE.PointLight('#ffff00', 2, 3)
-ghost3.shadow.mapSize.width = 256
-ghost3.shadow.mapSize.height = 256
-ghost3.shadow.camera.far = 7
 scene.add(ghost3)
-
-
-// // Ambient light
-// const ambientLight = new THREE.AmbientLight('#ffffff', 0.5) // lumière ambiante, avec une couleur blanche et une intensité de 0.5
-// gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001) // ajout d'un slider pour modifier l'intensité de la lumière ambiante
-// scene.add(ambientLight)
-
-// // Directional light
-// const moonLight = new THREE.DirectionalLight('#ffffff', 0.5) // lumière directionnelle, avec une couleur blanche et une intensité de 0.5
-// moonLight.position.set(4, 5, - 2) // position de la lumière directionnelle sur l'axe x, y et z
-// gui.add(moonLight, 'intensity').min(0).max(1).step(0.001) // ajout d'un slider pour modifier l'intensité de la lumière directionnelle
-// gui.add(moonLight.position, 'x').min(- 5).max(5).step(0.001) // ajout d'un slider pour modifier la position de la lumière directionnelle sur l'axe x
-// gui.add(moonLight.position, 'y').min(- 5).max(5).step(0.001) // ajout d'un slider pour modifier la position de la lumière directionnelle sur l'axe y
-// gui.add(moonLight.position, 'z').min(- 5).max(5).step(0.001) // ajout d'un slider pour modifier la position de la lumière directionnelle sur l'axe z
-// scene.add(moonLight)
 
 /**
  * Sizes
@@ -313,6 +325,10 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height) // taille du rendu de la scène en fonction de la largeur et de la hauteur de la fenêtre du navigateur
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)) // résolution du rendu de la scène en fonction de la résolution de l'écran (pour éviter les pixels flous)
 renderer.setClearColor('#262837')
+
+/**
+ * Shadows
+ */
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
@@ -321,6 +337,42 @@ doorLight.castShadow = true
 ghost1.castShadow = true
 ghost2.castShadow = true
 ghost3.castShadow = true
+
+floor.receiveShadow = true
+
+ghost1.shadow.mapSize.width = 256 // largeur de la carte d'ombre
+ghost1.shadow.mapSize.height = 256 // hauteur de la carte d'ombre
+ghost1.shadow.camera.far = 7 // distance maximale de la carte d'ombre
+
+ghost2.shadow.mapSize.width = 256
+ghost2.shadow.mapSize.height = 256
+ghost2.shadow.camera.far = 7
+
+ghost3.shadow.mapSize.width = 256
+ghost3.shadow.mapSize.height = 256
+ghost3.shadow.camera.far = 7
+
+moonLight.shadow.mapSize.width = 256
+moonLight.shadow.mapSize.height = 256
+moonLight.shadow.camera.far = 15
+
+doorLight.shadow.mapSize.width = 256
+doorLight.shadow.mapSize.height = 256
+doorLight.shadow.camera.far = 7
+
+backWallLight.shadow.mapSize.width = 256
+backWallLight.shadow.mapSize.height = 256
+backWallLight.shadow.camera.far = 7
+
+/**
+ * Debug
+ */
+
+// gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001) // ajout d'un slider pour modifier l'intensité de la lumière ambiante
+// gui.add(moonLight, 'intensity').min(0).max(1).step(0.001) // ajout d'un slider pour modifier l'intensité de la lumière directionnelle
+// gui.add(moonLight.position, 'x').min(- 5).max(5).step(0.001) // ajout d'un slider pour modifier la position de la lumière directionnelle sur l'axe x
+// gui.add(moonLight.position, 'y').min(- 5).max(5).step(0.001) // ajout d'un slider pour modifier la position de la lumière directionnelle sur l'axe y
+// gui.add(moonLight.position, 'z').min(- 5).max(5).step(0.001) // ajout d'un slider pour modifier la position de la lumière directionnelle sur l'axe z
 
 
 /**
