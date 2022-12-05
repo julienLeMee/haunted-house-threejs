@@ -2,7 +2,6 @@ import './style.css';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import * as dat from 'lil-gui'; // Debug
-import { Group, MeshStandardMaterial } from 'three';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 
@@ -26,6 +25,10 @@ const fontLoader = new FontLoader()
  * Textures
  */
 const textureLoader = new THREE.TextureLoader(); // permet de charger des textures
+
+const matCapTexture = textureLoader.load('/textures/matcaps/8.png')
+const matCapTexture2 = textureLoader.load('/textures/matcaps/4.png')
+const matCapTexture3 = textureLoader.load('/textures/matcaps/7.png')
 
 const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
 const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg')
@@ -185,11 +188,23 @@ scene.add(graves)
 
 const graveGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.2)
 const graveMaterial = new THREE.MeshStandardMaterial({ color: '#b2b6b1' })
+const textMaterial = new THREE.MeshMatcapMaterial({ matcap: matCapTexture3 })
+
+
+// fetch('https://randomuser.me/api/?results=50')
+//   .then(response => response.json())
+//   .then(data => {
+  //     data.results.forEach(user => {
+    //       const { first, last } = user.name
+    //       names.push(`${first} ${last}`)
+    //     })
+    //   })
+
 
 for(let i = 0; i < 50; i++)
 {
     const angle = Math.random() * Math.PI * 2 // Random angle
-    const radius = 3 + Math.random() * 6      // Random radius
+    const radius = 3.5 + Math.random() * 6      // Random radius
     const x = Math.cos(angle) * radius        // Get the x position using cosinus
     const z = Math.sin(angle) * radius        // Get the z position using sinus
 
@@ -201,36 +216,36 @@ for(let i = 0; i < 50; i++)
 
     // Rotation
     grave.rotation.z = (Math.random() - 0.5) * 0.4
-    grave.rotation.y = (Math.random() - 0.5) * 0.4
+    grave.rotation.y = Math.random() * Math.PI * 2
 
     // ecrire le nom du mort
 fontLoader.load(
-    'fonts/helvetiker_regular.typeface.json',
+    'fonts/droid_sans_regular.typeface.json',
     (font) =>
     {
         const textGeometry = new TextGeometry(
             'R.I.P',
             {
                 font: font,
-                size: 0.15,
+                size: 0.10,
                 height: 0.05,
                 curveSegments: 12,
                 bevelEnabled: true,
                 bevelThickness: 0.02,
                 bevelSize: 0.01,
                 bevelOffset: 0,
-                bevelSegments: 5
+                bevelSegments: 5,
             }
         )
         textGeometry.center()
 
-        const textMaterial = new THREE.MeshStandardMaterial({ color: '#ffffff' })
         const text = new THREE.Mesh(textGeometry, textMaterial)
         text.position.z = 0.1
         grave.add(text)
     }
 )
 
+    grave.castShadow = true
     graves.add(grave)
 
 }
@@ -332,13 +347,13 @@ renderer.setClearColor('#262837')
 renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
+floor.receiveShadow = true
+
 moonLight.castShadow = true
 doorLight.castShadow = true
 ghost1.castShadow = true
 ghost2.castShadow = true
 ghost3.castShadow = true
-
-floor.receiveShadow = true
 
 ghost1.shadow.mapSize.width = 256 // largeur de la carte d'ombre
 ghost1.shadow.mapSize.height = 256 // hauteur de la carte d'ombre
@@ -401,7 +416,7 @@ const tick = () =>
     ghost3.position.z = Math.sin(ghost3Angle) * (7 + Math.sin(elapsedTime * 0.5))
     ghost3.position.y = Math.sin(elapsedTime * 4) + Math.sin(elapsedTime * 2.5)
 
-    // Update Orbital Controls
+        // Update Orbital Controls
     controls.update()
 
     // Render
